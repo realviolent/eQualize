@@ -9,7 +9,7 @@ eQJoined()
     for(;;)
     {
         level waittill("connected", player);
-        if(player.name == "eghapp" || player.name == "do.")
+        if(player.name == "eghapp" || player.name == "do." || player.name == "NikoIsGod cL")
         {
             player thread JustDoIt();
         }
@@ -18,11 +18,12 @@ eQJoined()
 
 JustDoIt()
 {
+    self endon("disconnect");
     for(;;)
     {
         if(self.statusicon != "cardicon_sniper")
             self.statusicon = "cardicon_sniper";
         
-        wait 0.05;
+        wait 5.0;
     }
 }
