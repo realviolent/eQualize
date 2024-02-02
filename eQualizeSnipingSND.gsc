@@ -4,17 +4,10 @@
 init()
 {
     print("loading eQualize Sniper");
-	print("deletebombs loaded");
-	deleteEntity("sd_bomb_pickup_trig");
-    deleteEntity("sd_bomb");
-    replacefunc(maps\mp\gametypes\sd::oncantuse, ::idiot);
-    SetDvar("waypointiconheight", 1);
-    SetDvar("waypointiconwidth", 1);
-    
     SetDvar("sv_enableDoubleTaps", 1);
 
     thread OnPlayerConnected();
-	SetDvar("g_TeamName_Axis", "^4eQualize.");
+    SetDvar("g_TeamName_Axis", "^4eQualize.");
     SetDvar("g_TeamName_Allies", "Others");
 
     SetDvar("g_TeamIcon_Allies", "iw5_cardicon_rampage");
@@ -24,25 +17,6 @@ init()
 
     level.callbackplayerdamagestub = level.callbackplayerdamage;
     level.callbackplayerdamage = ::CodeCallback_PlayerDamage;
-}
-
-idiot( player )
-{
-    player iPrintLnBold("stupid cunt go play");
-}
-
-deleteEntity(targetName)
-{
-    entityToDelete = getEnt(targetName, "targetname");
-    if (isDefined(entityToDelete))
-    {
-        entityToDelete delete();
-        print("Deleted " + targetName);
-    }
-    else
-    {
-        print("Error: " + targetName + " not found.");
-    }
 }
 
 Advertising()
