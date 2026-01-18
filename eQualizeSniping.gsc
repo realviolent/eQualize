@@ -4,8 +4,10 @@
 init()
 {
     print("loading eQualize Sniper");
-    
+
     SetDvar("sv_enableDoubleTaps", 1);
+
+    level.sniper_weapon_cache = [];
 
     thread OnPlayerConnected();
 
@@ -37,14 +39,14 @@ OnPlayerConnected()
 }
 
 OnPlayerSpawned()
-{    
+{
 	self endon("disconnect");
 	for (;;)
     {
         self waittill("changed_kit");
 		if(isSubStr(self GetCurrentWeapon(), "usp") || isSniper(self GetCurrentWeapon()) == false)
-			GiveIntervention();		
-	}	
+			GiveIntervention();
+	}
 }
 
 GiveIntervention()
@@ -60,21 +62,32 @@ GiveIntervention()
 
 isSniper(WEAPON)
 {
+	if(!isDefined(WEAPON))
+		return false;
+
+	if(isDefined(level.sniper_weapon_cache) && isDefined(level.sniper_weapon_cache[WEAPON]))
+		return level.sniper_weapon_cache[WEAPON];
+
+	result = false;
 	if(isSubStr(WEAPON, "cheytac") ||
 	isSubStr(WEAPON, "msr") ||
 	isSubStr(WEAPON, "l96a1") ||
 	WEAPON == "throwingknife_mp")
-		return true;
-	return false;
+		result = true;
+
+	if(isDefined(level.sniper_weapon_cache))
+		level.sniper_weapon_cache[WEAPON] = result;
+
+	return result;
 }
 
 AntiHardscope(timer)
 {
-    self endon("disconnect");	
+    self endon("disconnect");
     adscycle = 0;
 	for(;;)
     {
-		
+
 		if(self PlayerAds() >= 1 && isSniper(self GetCurrentWeapon()))
 		{
 			adscycle++;
@@ -83,7 +96,7 @@ AntiHardscope(timer)
 		{
 			adscycle = 0;
 		}
-		
+
 		if(adscycle >= timer)
 		{
 			adscycle = 0;
@@ -100,11 +113,11 @@ AntiHardscope(timer)
 
 AntiHardscopeNoJoke(timer)
 {
-    self endon("disconnect");	
+    self endon("disconnect");
     adscycle = 0;
 	for(;;)
     {
-		
+
 		if(self PlayerAds() >= 1 && isSniper(self GetCurrentWeapon()))
 		{
 			adscycle++;
@@ -113,7 +126,7 @@ AntiHardscopeNoJoke(timer)
 		{
 			adscycle = 0;
 		}
-		
+
 		if(adscycle >= timer)
 		{
 			adscycle = 0;
@@ -136,7 +149,7 @@ killstreakPlayer()
 	self.hudkillstreak = createFontString ("Objective", 0.75);
 	self.hudkillstreak setPoint ("TOPCENTER", "TOPCENTER", 0, 0);
 	self.hudkillstreak.label = &"^4 KILLSTREAK: ^7";
-	
+
 	while(true)
 	{
 		self.hudkillstreak setValue(self.pers["cur_kill_streak"]);
@@ -159,7 +172,7 @@ CodeCallback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 	{
 		self.health += iDamage;
 	}
-	
+
 	if (isDefined(eAttacker))
 	{
 		if (isDefined(eAttacker.guid) && isDefined(self.guid))
@@ -173,7 +186,7 @@ CodeCallback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 					case "MOD_GRENADE_SPLASH": iDamage = 0;
 					break;
 					case "MOD_EXPLOSIVE": iDamage = 0;
-					break;					
+					break;
 					case "MOD_FALLING": iDamage = 0;
 					break;
 				}
