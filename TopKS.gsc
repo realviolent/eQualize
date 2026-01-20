@@ -6,7 +6,7 @@ init()
 
 
     thread OnPlayerConnected();
-    
+
 	replaceFunc(maps\mp\gametypes\_gamelogic::waittillFinalKillcamDone, ::AfterKillcam);
 }
 
@@ -28,11 +28,11 @@ DisplayHighestKD()
 	self.topkd = self createFontString("small", 1);
     self.topkd setPoint("TOPRIGHT", "TOPRIGHT", 0, 10);
     self.topkd.label = &"^4Your KD: ^7";
-    
+
     while(true)
     {
 		if(level.players.size > 0 && isDefined(self.kd))
-		{			
+		{
 			self.topkd setValue(self.kd);
 		}
         wait 0.5;
@@ -67,13 +67,13 @@ OnPlayerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 DisplayPlayerSummary()
 {
     playerList = [];
-	
+
     popupBackground = level CreateServerIcon("gfx/white", 1100, 900);
     popupBackground SetPoint("CENTER", "CENTER", 0, 0);
 	popupBackground.alpha = .5;
     popupBackground SetShader("black", 600, 300);
     popupBackground FadeOverTime(15);
-	
+
     headerFont = level createServerFontString("small", 1.5);
     headerFont setPoint("TOPCENTER", "TOPCENTER", 0, 100);
     headerFont setText("^5Player                          Highest Killstreak");
@@ -82,7 +82,7 @@ DisplayPlayerSummary()
     {
         playerList[playerList.size] = player;
     }
-    playerList = BubbleSortPlayers(playerList);
+    playerList = SortPlayers(playerList);
 
     for (i = 0; i < playerList.size; i++)
     {
@@ -98,19 +98,18 @@ DisplayPlayerSummary()
     }
 }
 
-BubbleSortPlayers(players)
+SortPlayers(players)
 {
-    for (i = 0; i < players.size; i++)
+    for (i = 1; i < players.size; i++)
     {
-        for (j = 0; j < players.size - i - 1; j++)
+        key = players[i];
+        j = i - 1;
+        while (j >= 0 && players[j].pers["highKS"] < key.pers["highKS"])
         {
-            if (players[j].pers["highKS"] < players[j + 1].pers["highKS"])
-            {
-                temp = players[j];
-                players[j] = players[j + 1];
-                players[j + 1] = temp;
-            }
+            players[j + 1] = players[j];
+            j = j - 1;
         }
+        players[j + 1] = key;
     }
     return players;
 }
