@@ -34,8 +34,7 @@ OnPlayerConnected()
 		player thread OnPlayerSpawned();
 
 		player thread MonitorSniperWeapon();
-		player thread AntiHardscope(10);
-        player thread AntiHardscopeNoJoke(16);
+		player thread MonitorHardscope(10, 16);
 
         player thread killstreakPlayer();
 	}
@@ -87,63 +86,43 @@ MonitorSniperWeapon()
     }
 }
 
-AntiHardscope(timer)
+MonitorHardscope(timer1, timer2)
 {
     self endon("disconnect");
-    adscycle = 0;
-	for(;;)
+    cycle1 = 0;
+    cycle2 = 0;
+    for(;;)
     {
+        if(self PlayerAds() >= 1 && self.isCurrentWeaponSniper)
+        {
+            cycle1++;
+            cycle2++;
+        }
+        else
+        {
+            cycle1 = 0;
+            cycle2 = 0;
+        }
 
-		if(self PlayerAds() >= 1 && self.isCurrentWeaponSniper)
-		{
-			adscycle++;
-		}
-		else
-		{
-			adscycle = 0;
-		}
+        if(cycle1 >= timer1)
+        {
+            cycle1 = 0;
+            self AllowAds(false);
+            wait 0.05;
+        }
 
-		if(adscycle >= timer)
-		{
-			adscycle = 0;
-			self AllowAds(false);
-			wait 0.05;
-		}
-		if(self AdsButtonPressed() == false)
-		{
-			self AllowAds(true);
-		}
-        wait 0.05;
-    }
-}
-
-AntiHardscopeNoJoke(timer)
-{
-    self endon("disconnect");
-    adscycle = 0;
-	for(;;)
-    {
-
-		if(self PlayerAds() >= 1 && self.isCurrentWeaponSniper)
-		{
-			adscycle++;
-		}
-		else
-		{
-			adscycle = 0;
-		}
-
-		if(adscycle >= timer)
-		{
-			adscycle = 0;
-			self StunPlayer(true);
+        if(cycle2 >= timer2)
+        {
+            cycle2 = 0;
+            self StunPlayer(true);
             self iPrintLnBold("^1hmmmmmmmmmmmm");
-			wait 0.05;
-		}
-		if(self AdsButtonPressed() == false)
-		{
-			self AllowAds(true);
-		}
+            wait 0.05;
+        }
+
+        if(self AdsButtonPressed() == false)
+        {
+            self AllowAds(true);
+        }
         wait 0.05;
     }
 }
