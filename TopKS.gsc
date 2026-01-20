@@ -6,7 +6,7 @@ init()
 
 
     thread OnPlayerConnected();
-    
+
 	replaceFunc(maps\mp\gametypes\_gamelogic::waittillFinalKillcamDone, ::AfterKillcam);
 }
 
@@ -28,14 +28,10 @@ DisplayHighestKD()
 	self.topkd = self createFontString("small", 1);
     self.topkd setPoint("TOPRIGHT", "TOPRIGHT", 0, 10);
     self.topkd.label = &"^4Your KD: ^7";
-    
-    while(true)
+
+    if(isDefined(self.kd))
     {
-		if(level.players.size > 0 && isDefined(self.kd))
-		{			
-			self.topkd setValue(self.kd);
-		}
-        wait 0.5;
+        self.topkd setValue(self.kd);
     }
 }
 
@@ -43,6 +39,11 @@ UpdateKD()
 {
     kd = (self.deaths > 0) ? (self.kills / self.deaths) : self.kills;
 	self.kd = kd;
+
+    if(isDefined(self.topkd))
+    {
+        self.topkd setValue(self.kd);
+    }
 }
 
 AfterKillcam()
@@ -67,13 +68,13 @@ OnPlayerKilled(eInflictor, eAttacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHi
 DisplayPlayerSummary()
 {
     playerList = [];
-	
+
     popupBackground = level CreateServerIcon("gfx/white", 1100, 900);
     popupBackground SetPoint("CENTER", "CENTER", 0, 0);
 	popupBackground.alpha = .5;
     popupBackground SetShader("black", 600, 300);
     popupBackground FadeOverTime(15);
-	
+
     headerFont = level createServerFontString("small", 1.5);
     headerFont setPoint("TOPCENTER", "TOPCENTER", 0, 100);
     headerFont setText("^5Player                          Highest Killstreak");
