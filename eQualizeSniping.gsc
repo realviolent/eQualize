@@ -31,8 +31,6 @@ OnPlayerConnected()
 
 		player thread MonitorSniperWeapon();
 		player thread MonitorHardscope(10, 16);
-
-        player thread killstreakPlayer();
 	}
 }
 
@@ -85,8 +83,17 @@ MonitorSniperWeapon()
 MonitorHardscope(timer1, timer2)
 {
     self endon("disconnect");
+
+    // Killstreak HUD
+    level endon("game_ended");
+	self.hudkillstreak = createFontString ("Objective", 0.75);
+	self.hudkillstreak setPoint ("TOPCENTER", "TOPCENTER", 0, 0);
+	self.hudkillstreak.label = &"^4 KILLSTREAK: ^7";
+
     cycle1 = 0;
     cycle2 = 0;
+    ks_cycle = 0;
+
     for(;;)
     {
         if(self PlayerAds() >= 1 && self.isCurrentWeaponSniper)
@@ -104,7 +111,6 @@ MonitorHardscope(timer1, timer2)
         {
             cycle1 = 0;
             self AllowAds(false);
-            wait 0.05;
         }
 
         if(cycle2 >= timer2)
@@ -112,30 +118,22 @@ MonitorHardscope(timer1, timer2)
             cycle2 = 0;
             self StunPlayer(true);
             self iPrintLnBold("^1hmmmmmmmmmmmm");
-            wait 0.05;
         }
 
         if(self AdsButtonPressed() == false)
         {
             self AllowAds(true);
         }
+
+        ks_cycle++;
+        if (ks_cycle >= 10)
+        {
+            self.hudkillstreak setValue(self.pers["cur_kill_streak"]);
+            ks_cycle = 0;
+        }
+
         wait 0.05;
     }
-}
-
-killstreakPlayer()
-{
-	self endon ("disconnect");
-	level endon("game_ended");
-	self.hudkillstreak = createFontString ("Objective", 0.75);
-	self.hudkillstreak setPoint ("TOPCENTER", "TOPCENTER", 0, 0);
-	self.hudkillstreak.label = &"^4 KILLSTREAK: ^7";
-
-	while(true)
-	{
-		self.hudkillstreak setValue(self.pers["cur_kill_streak"]);
-		wait 0.5;
-	}
 }
 
 
