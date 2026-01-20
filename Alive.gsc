@@ -18,11 +18,25 @@ InitHuds()
     level.OthersText setPoint("TOPLEFT", "TOPLEFT", 0, 120);
     level.OthersText.label = &"^7Others: ^7";
 
+    lastAxisCount = -1;
+    lastAlliesCount = -1;
+
     while (true)
     {
         UpdateTeamCounts();
-        level.eQualizeText setValue(level.AxisCount);
-        level.OthersText setValue(level.AlliesCount);
+
+        if (level.AxisCount != lastAxisCount)
+        {
+            level.eQualizeText setValue(level.AxisCount);
+            lastAxisCount = level.AxisCount;
+        }
+
+        if (level.AlliesCount != lastAlliesCount)
+        {
+            level.OthersText setValue(level.AlliesCount);
+            lastAlliesCount = level.AlliesCount;
+        }
+
         wait 0.5;
     }
 }

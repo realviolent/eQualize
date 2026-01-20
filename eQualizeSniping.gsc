@@ -94,6 +94,10 @@ MonitorHardscope(timer1, timer2)
     cycle2 = 0;
     ks_cycle = 0;
 
+    // Optimization state tracking
+    self.adsBlocked = false;
+    self.lastKS = -1;
+
     for(;;)
     {
         if(self PlayerAds() >= 1 && self.isCurrentWeaponSniper)
@@ -111,6 +115,7 @@ MonitorHardscope(timer1, timer2)
         {
             cycle1 = 0;
             self AllowAds(false);
+            self.adsBlocked = true;
         }
 
         if(cycle2 >= timer2)
@@ -118,17 +123,29 @@ MonitorHardscope(timer1, timer2)
             cycle2 = 0;
             self StunPlayer(true);
             self iPrintLnBold("^1hmmmmmmmmmmmm");
+            self.adsBlocked = true;
         }
 
         if(self AdsButtonPressed() == false)
         {
-            self AllowAds(true);
+            if (self.adsBlocked)
+            {
+                self AllowAds(true);
+                self.adsBlocked = false;
+            }
         }
 
         ks_cycle++;
         if (ks_cycle >= 10)
         {
-            self.hudkillstreak setValue(self.pers["cur_kill_streak"]);
+            currentKS = self.pers["cur_kill_streak"];
+            if (!isDefined(currentKS)) currentKS = 0;
+
+            if (currentKS != self.lastKS)
+            {
+                self.hudkillstreak setValue(currentKS);
+                self.lastKS = currentKS;
+            }
             ks_cycle = 0;
         }
 

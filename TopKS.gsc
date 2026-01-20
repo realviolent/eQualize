@@ -29,11 +29,17 @@ DisplayHighestKD()
     self.topkd setPoint("TOPRIGHT", "TOPRIGHT", 0, 10);
     self.topkd.label = &"^4Your KD: ^7";
 
+    self.lastKD = -1;
+
     while(true)
     {
 		if(level.players.size > 0 && isDefined(self.kd))
 		{
-			self.topkd setValue(self.kd);
+            if (self.kd != self.lastKD)
+            {
+			    self.topkd setValue(self.kd);
+                self.lastKD = self.kd;
+            }
 		}
         wait 0.5;
     }
