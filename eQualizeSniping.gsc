@@ -4,7 +4,7 @@
 init()
 {
     print("loading eQualize Sniper");
-    
+
     SetDvar("sv_enableDoubleTaps", 1);
 
     thread OnPlayerConnected();
@@ -29,22 +29,21 @@ OnPlayerConnected()
         level waittill("connected", player);
 		player thread OnPlayerSpawned();
 
-		player thread AntiHardscope(10);
-        player thread AntiHardscopeNoJoke(16);
+		player thread MonitorHardscope(10, 16);
 
         player thread killstreakPlayer();
 	}
 }
 
 OnPlayerSpawned()
-{    
+{
 	self endon("disconnect");
 	for (;;)
     {
         self waittill("changed_kit");
 		if(isSubStr(self GetCurrentWeapon(), "usp") || isSniper(self GetCurrentWeapon()) == false)
-			GiveIntervention();		
-	}	
+			GiveIntervention();
+	}
 }
 
 GiveIntervention()
@@ -68,63 +67,43 @@ isSniper(WEAPON)
 	return false;
 }
 
-AntiHardscope(timer)
+MonitorHardscope(timer1, timer2)
 {
-    self endon("disconnect");	
-    adscycle = 0;
-	for(;;)
+    self endon("disconnect");
+    cycle1 = 0;
+    cycle2 = 0;
+    for(;;)
     {
-		
-		if(self PlayerAds() >= 1 && isSniper(self GetCurrentWeapon()))
-		{
-			adscycle++;
-		}
-		else
-		{
-			adscycle = 0;
-		}
-		
-		if(adscycle >= timer)
-		{
-			adscycle = 0;
-			self AllowAds(false);
-			wait 0.05;
-		}
-		if(self AdsButtonPressed() == false)
-		{
-			self AllowAds(true);
-		}
-        wait 0.05;
-    }
-}
+        if(self PlayerAds() >= 1 && isSniper(self GetCurrentWeapon()))
+        {
+            cycle1++;
+            cycle2++;
+        }
+        else
+        {
+            cycle1 = 0;
+            cycle2 = 0;
+        }
 
-AntiHardscopeNoJoke(timer)
-{
-    self endon("disconnect");	
-    adscycle = 0;
-	for(;;)
-    {
-		
-		if(self PlayerAds() >= 1 && isSniper(self GetCurrentWeapon()))
-		{
-			adscycle++;
-		}
-		else
-		{
-			adscycle = 0;
-		}
-		
-		if(adscycle >= timer)
-		{
-			adscycle = 0;
-			self StunPlayer(true);
+        if(cycle1 >= timer1)
+        {
+            cycle1 = 0;
+            self AllowAds(false);
+            wait 0.05;
+        }
+
+        if(cycle2 >= timer2)
+        {
+            cycle2 = 0;
+            self StunPlayer(true);
             self iPrintLnBold("^1hmmmmmmmmmmmm");
-			wait 0.05;
-		}
-		if(self AdsButtonPressed() == false)
-		{
-			self AllowAds(true);
-		}
+            wait 0.05;
+        }
+
+        if(self AdsButtonPressed() == false)
+        {
+            self AllowAds(true);
+        }
         wait 0.05;
     }
 }
@@ -136,7 +115,7 @@ killstreakPlayer()
 	self.hudkillstreak = createFontString ("Objective", 0.75);
 	self.hudkillstreak setPoint ("TOPCENTER", "TOPCENTER", 0, 0);
 	self.hudkillstreak.label = &"^4 KILLSTREAK: ^7";
-	
+
 	while(true)
 	{
 		self.hudkillstreak setValue(self.pers["cur_kill_streak"]);
@@ -159,7 +138,7 @@ CodeCallback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 	{
 		self.health += iDamage;
 	}
-	
+
 	if (isDefined(eAttacker))
 	{
 		if (isDefined(eAttacker.guid) && isDefined(self.guid))
@@ -173,7 +152,7 @@ CodeCallback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 					case "MOD_GRENADE_SPLASH": iDamage = 0;
 					break;
 					case "MOD_EXPLOSIVE": iDamage = 0;
-					break;					
+					break;
 					case "MOD_FALLING": iDamage = 0;
 					break;
 				}
