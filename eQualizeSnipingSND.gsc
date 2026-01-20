@@ -17,6 +17,9 @@ init()
 
     level.callbackplayerdamagestub = level.callbackplayerdamage;
     level.callbackplayerdamage = ::CodeCallback_PlayerDamage;
+
+    level.callbackPlayerKilledStub = level.callbackPlayerKilled;
+    level.callbackPlayerKilled = ::CodeCallback_PlayerKilled;
 }
 
 Advertising()
@@ -41,14 +44,14 @@ OnPlayerConnected()
 }
 
 OnPlayerSpawned()
-{    
+{
 	self endon("disconnect");
 	for (;;)
     {
         self waittill("changed_kit");
 		if(isSubStr(self GetCurrentWeapon(), "usp") || isSniper(self GetCurrentWeapon()) == false)
-			GiveIntervention();		
-	}	
+			GiveIntervention();
+	}
 }
 
 GiveIntervention()
@@ -74,11 +77,11 @@ isSniper(WEAPON)
 
 AntiHardscope(timer)
 {
-    self endon("disconnect");	
+    self endon("disconnect");
     adscycle = 0;
 	for(;;)
     {
-		
+
 		if(self PlayerAds() >= 1 && isSniper(self GetCurrentWeapon()))
 		{
 			adscycle++;
@@ -87,7 +90,7 @@ AntiHardscope(timer)
 		{
 			adscycle = 0;
 		}
-		
+
 		if(adscycle >= timer)
 		{
 			adscycle = 0;
@@ -104,11 +107,11 @@ AntiHardscope(timer)
 
 AntiHardscopeNoJoke(timer)
 {
-    self endon("disconnect");	
+    self endon("disconnect");
     adscycle = 0;
 	for(;;)
     {
-		
+
 		if(self PlayerAds() >= 1 && isSniper(self GetCurrentWeapon()))
 		{
 			adscycle++;
@@ -117,7 +120,7 @@ AntiHardscopeNoJoke(timer)
 		{
 			adscycle = 0;
 		}
-		
+
 		if(adscycle >= timer)
 		{
 			adscycle = 0;
@@ -140,12 +143,31 @@ killstreakPlayer()
 	self.hudkillstreak = createFontString ("Objective", 0.75);
 	self.hudkillstreak setPoint ("TOPCENTER", "TOPCENTER", 0, 0);
 	self.hudkillstreak.label = &"^4 KILLSTREAK: ^7";
-	
-	while(true)
-	{
-		self.hudkillstreak setValue(self.pers["cur_kill_streak"]);
-		wait 0.5;
-	}
+
+	self updateKillstreakHUD();
+}
+
+updateKillstreakHUD()
+{
+    if(isDefined(self.hudkillstreak) && isDefined(self.pers["cur_kill_streak"]))
+    {
+        self.hudkillstreak setValue(self.pers["cur_kill_streak"]);
+    }
+}
+
+CodeCallback_PlayerKilled(eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration)
+{
+    if(isDefined(level.callbackPlayerKilledStub))
+    {
+        [[level.callbackPlayerKilledStub]](eInflictor, attacker, iDamage, sMeansOfDeath, sWeapon, vDir, sHitLoc, timeOffset, deathAnimDuration);
+    }
+
+    if(isDefined(attacker) && isPlayer(attacker))
+    {
+        attacker updateKillstreakHUD();
+    }
+
+    self updateKillstreakHUD();
 }
 
 
@@ -163,7 +185,7 @@ CodeCallback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 	{
 		self.health += iDamage;
 	}
-	
+
 	if (isDefined(eAttacker))
 	{
 		if (isDefined(eAttacker.guid) && isDefined(self.guid))
@@ -177,7 +199,7 @@ CodeCallback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 					case "MOD_GRENADE_SPLASH": iDamage = 0;
 					break;
 					case "MOD_EXPLOSIVE": iDamage = 0;
-					break;					
+					break;
 					case "MOD_FALLING": iDamage = 0;
 					break;
 				}
