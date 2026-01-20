@@ -33,6 +33,7 @@ OnPlayerConnected()
         level waittill("connected", player);
 		player thread OnPlayerSpawned();
 
+		player thread MonitorSniperWeapon();
 		player thread MonitorHardscope(10, 16);
 
         player thread killstreakPlayer();
@@ -71,25 +72,33 @@ isSniper(WEAPON)
 	return false;
 }
 
+MonitorSniperWeapon()
+{
+    self endon("disconnect");
+
+    // Initialize
+    self.isCurrentWeaponSniper = isSniper(self GetCurrentWeapon());
+
+    for(;;)
+    {
+        self waittill("weapon_change", newWeapon);
+        self.isCurrentWeaponSniper = isSniper(newWeapon);
+    }
+}
+
 MonitorHardscope(timer1, timer2)
 {
     self endon("disconnect");
     cycle1 = 0;
     cycle2 = 0;
 
-    wep = self GetCurrentWeapon();
-    isSnip = isSniper(wep);
+    // Ensure isCurrentWeaponSniper is defined (MonitorSniperWeapon runs in parallel)
+    if (!isDefined(self.isCurrentWeaponSniper))
+        self.isCurrentWeaponSniper = isSniper(self GetCurrentWeapon());
 
     for(;;)
     {
-        newWep = self GetCurrentWeapon();
-        if(newWep != wep)
-        {
-            wep = newWep;
-            isSnip = isSniper(wep);
-        }
-
-        if(self PlayerAds() >= 1 && isSnip)
+        if(self PlayerAds() >= 1 && self.isCurrentWeaponSniper)
         {
             cycle1++;
             cycle2++;
