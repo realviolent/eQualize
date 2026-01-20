@@ -84,17 +84,19 @@ DisplayPlayerSummary()
     }
     playerList = SortPlayers(playerList);
 
-    for (i = 0; i < playerList.size; i++)
+    count = playerList.size;
+    if (count > 5)
+    {
+        count = 5;
+    }
+
+    for (i = 0; i < count; i++)
     {
         player = playerList[i];
-        rank = i + 1;
 
         hud_highKS = level createServerFontString("small", 1.5);
         hud_highKS setPoint("TOPCENTER", "TOPCENTER", 0, 130 + i * 20);
-		if(rank < 6)
-		{
-			hud_highKS setText("^7" + player.Name + "\r                                                           " + player.pers["highKS"]);
-		}
+        hud_highKS setText("^7" + player.Name + "\r                                                           " + player.pers["highKS"]);
     }
 }
 
@@ -103,8 +105,9 @@ SortPlayers(players)
     for (i = 1; i < players.size; i++)
     {
         key = players[i];
+        keyVal = key.pers["highKS"];
         j = i - 1;
-        while (j >= 0 && players[j].pers["highKS"] < key.pers["highKS"])
+        while (j >= 0 && players[j].pers["highKS"] < keyVal)
         {
             players[j + 1] = players[j];
             j = j - 1;
