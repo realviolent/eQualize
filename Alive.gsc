@@ -20,38 +20,26 @@ InitHuds()
 
     while (true)
     {
-        eQualizeTeamCount = AxisTeam();
-        OthersTeamCount = AlliesTeam();
-        level.eQualizeText setValue(eQualizeTeamCount);
-        level.OthersText setValue(OthersTeamCount);
+        UpdateTeamCounts();
+        level.eQualizeText setValue(level.AxisCount);
+        level.OthersText setValue(level.AlliesCount);
         wait 0.5;
     }
 }
 
-AxisTeam()
+UpdateTeamCounts()
 {
     level.AxisCount = 0;
-
-    foreach (player in level.players)
-    {
-        if (isDefined(player) && player.team == "axis" && isAlive(player))
-        {
-            level.AxisCount++;
-        }
-    }
-    return level.AxisCount;
-}
-
-AlliesTeam()
-{
     level.AlliesCount = 0;
 
     foreach (player in level.players)
     {
-        if (isDefined(player) && player.team == "allies" && isAlive(player))
+        if (isDefined(player) && isAlive(player))
         {
-            level.AlliesCount++;
+            if (player.team == "axis")
+                level.AxisCount++;
+            else if (player.team == "allies")
+                level.AlliesCount++;
         }
     }
-    return level.AlliesCount;
 }
