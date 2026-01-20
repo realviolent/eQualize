@@ -29,8 +29,7 @@ OnPlayerConnected()
         level waittill("connected", player);
 		player thread OnPlayerSpawned();
 
-		player thread AntiHardscope(10);
-        player thread AntiHardscopeNoJoke(16);
+		player thread AntiHardscope(10, 16);
 
         player thread killstreakPlayer();
 	}
