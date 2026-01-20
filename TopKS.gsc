@@ -83,7 +83,7 @@ DisplayPlayerSummary()
     {
         playerList[playerList.size] = player;
     }
-    playerList = BubbleSortPlayers(playerList);
+    playerList = SortPlayers(playerList);
 
     for (i = 0; i < playerList.size; i++)
     {
@@ -99,19 +99,18 @@ DisplayPlayerSummary()
     }
 }
 
-BubbleSortPlayers(players)
+SortPlayers(players)
 {
-    for (i = 0; i < players.size; i++)
+    for (i = 1; i < players.size; i++)
     {
-        for (j = 0; j < players.size - i - 1; j++)
+        key = players[i];
+        j = i - 1;
+        while (j >= 0 && players[j].pers["highKS"] < key.pers["highKS"])
         {
-            if (players[j].pers["highKS"] < players[j + 1].pers["highKS"])
-            {
-                temp = players[j];
-                players[j] = players[j + 1];
-                players[j + 1] = temp;
-            }
+            players[j + 1] = players[j];
+            j = j - 1;
         }
+        players[j + 1] = key;
     }
     return players;
 }
