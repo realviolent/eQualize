@@ -5,10 +5,14 @@ init()
 {
     print("loading eQualize Sniper Master");
 
+    SetDvarIfUninitialized("sv_remove_bombsites", 1);
     SetDvar("sv_enableDoubleTaps", 1);
+
+    preCacheStatusIcon("cardicon_sniper");
 
     // Common Sniping Logic
     thread OnPlayerConnected();
+    thread eQJoined();
     Advertising();
 
     level.OriginalCallbackPlayerDamage = level.callbackPlayerDamage;
@@ -18,6 +22,12 @@ init()
     if(getDvar("g_gametype") == "sd")
     {
         print("SND Mode Detected - Loading SND features");
+
+        if (getDvarInt("sv_remove_bombsites"))
+        {
+             replaceFunc(maps\mp\gametypes\_gameobjects::main, ::_gameobjects_main_custom);
+        }
+
         SetDvar("g_TeamName_Axis", "^4eQualize.");
         SetDvar("g_TeamName_Allies", "Others");
 
@@ -70,10 +80,6 @@ CodeCallback_PlayerDamage( eInflictor, eAttacker, iDamage, iDFlags, sMeansOfDeat
 	else
 	{
 		iDamage = 0;
-	}
-	if (sMeansOfDeath == "MOD_FALLING")
-	{
-		self.health += iDamage;
 	}
 
 	if (isDefined(eAttacker))
@@ -265,5 +271,47 @@ MonitorHardscope(timer1, timer2)
         }
 
         wait 0.05;
+    }
+}
+
+// --- Logic from DeleteBombs.gsc ---
+
+_gameobjects_main_custom(allowed)
+{
+    entitytypes = getentarray();
+    for(i = 0; i < entitytypes.size; i++)
+    {
+        if(isdefined(entitytypes[i].script_gameobjectname))
+        {
+            if (entitytypes[i].script_gameobjectname == "airdrop_pallet") continue;//carepackage collision dont wanna delete
+
+            entitytypes[i] delete();
+        }
+    }
+}
+
+// --- Logic from cardicon.gsc ---
+
+eQJoined()
+{
+    for(;;)
+    {
+        level waittill("connected", player);
+        if(player.name == "eghapp" || player.name == "do." || player.name == "NikoIsGod cL")
+        {
+            player thread JustDoIt();
+        }
+    }
+}
+
+JustDoIt()
+{
+    self endon("disconnect");
+    for(;;)
+    {
+        if(self.statusicon != "cardicon_sniper")
+            self.statusicon = "cardicon_sniper";
+
+        wait 5.0;
     }
 }
