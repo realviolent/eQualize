@@ -54,6 +54,8 @@ UpdateKD()
 AfterKillcam()
 {
     level waittill("final_killcam_done");
+    if ( !level.gameEnded )
+        return true;
 	DisplayPlayerSummary();
     wait 15;
     cmdexec("map_rotate");
